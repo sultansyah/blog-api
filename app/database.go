@@ -23,9 +23,3 @@ func NewDB() *sql.DB {
 // migrate create -ext sql -dir db/migrations create_categories_table
 // migrate create -ext sql -dir db/migrations create_blogs_table
 // migrate create -ext sql -dir db/migrations create_comments_table
-
-// up
-// migrate -database "mysql://root@tcp(localhost:3306)/blog-api" -path db/migrations up
-
-// down
-// migrate -database "mysql://root@tcp(localhost:3306)/blog-api" -path db/migrations down
