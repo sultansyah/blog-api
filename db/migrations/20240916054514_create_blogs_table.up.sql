@@ -4,6 +4,8 @@ CREATE TABLE blogs(
     category_id INT NULL,
     title VARCHAR(255) NOT NULL,
     content text NOT NULL,
+    likes INT DEFAULT 0,
+    comments_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
