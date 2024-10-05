@@ -57,9 +57,9 @@ func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, use
 	}
 }
 
-func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error) {
-	sql := "select username, created_at from users where id = ?"
-	rows, err := tx.QueryContext(ctx, sql, userId)
+func (repository *UserRepositoryImpl) FindByUsername(ctx context.Context, tx *sql.Tx, userUsername string) (domain.User, error) {
+	sql := "select password from users where username = ?"
+	rows, err := tx.QueryContext(ctx, sql, userUsername)
 	if err != nil {
 		panic(err)
 	}
