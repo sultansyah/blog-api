@@ -31,34 +31,29 @@ func (repository *UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user
 	return user
 }
 
-func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
-	sql := "select email, password_hash from users where username = ?"
-	rows, err := tx.QueryContext(ctx, sql, user.Username)
+func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error) {
+	sql := "select email, username, password_hash, created_at from users where id = ?"
+	rows, err := tx.QueryContext(ctx, sql, userId)
 	if err != nil {
 		panic(err)
 	}
 
 	defer rows.Close()
 
-	userVerify := domain.User{}
+	user := domain.User{}
 	if rows.Next() {
-		err := rows.Scan(&userVerify.Email, &userVerify.PasswordHash)
+		err := rows.Scan(&user.Email, &user.Username, &user.PasswordHash, &user.CreatedAt)
 		if err != nil {
 			panic(err)
 		}
 
-		if user.PasswordHash == userVerify.PasswordHash {
-			return user, nil
-		} else {
-			return user, errors.New("username and password are incorrect")
-		}
-	} else {
-		return user, errors.New("user not found")
+		return user, nil
 	}
+	return user, errors.New("user not found")
 }
 
 func (repository *UserRepositoryImpl) FindByUsername(ctx context.Context, tx *sql.Tx, userUsername string) (domain.User, error) {
-	sql := "select password from users where username = ?"
+	sql := "select email, username, password_hash, created_at from users where username = ?"
 	rows, err := tx.QueryContext(ctx, sql, userUsername)
 	if err != nil {
 		panic(err)
@@ -68,7 +63,7 @@ func (repository *UserRepositoryImpl) FindByUsername(ctx context.Context, tx *sq
 
 	user := domain.User{}
 	if rows.Next() {
-		err := rows.Scan(&user.Username, &user.CreatedAt)
+		err := rows.Scan(&user.Email, &user.Username, &user.PasswordHash, &user.CreatedAt)
 		if err != nil {
 			panic(err)
 		}

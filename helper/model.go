@@ -12,3 +12,13 @@ func ToUserResponse(user domain.User) web.UserResponse {
 		CreatedAt: user.CreatedAt,
 	}
 }
+
+func ToUserLoginResponse(user domain.User, accessToken string, refreshToken string) web.UserLoginResponse {
+	return web.UserLoginResponse{
+		Id:           user.Id,
+		Username:     user.Username,
+		CreatedAt:    user.CreatedAt,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+}

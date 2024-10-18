@@ -18,7 +18,7 @@ type UserServiceImpl struct {
 	Validate   *validator.Validate
 }
 
-func newUserService(userRepository repository.UserRepository, DB *sql.DB, validate *validator.Validate) UserService {
+func NewUserService(userRepository repository.UserRepository, DB *sql.DB, validate *validator.Validate) UserService {
 	return &UserServiceImpl{
 		repository: userRepository,
 		DB:         DB,
@@ -35,12 +35,12 @@ func HashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
-func CheckPasswordHash(password, hash string) (bool, error) {
+func CheckPasswordHash(password, hash string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	if err != nil {
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }
 
 func (service UserServiceImpl) Create(ctx context.Context, request web.UserCreateRequest) web.UserResponse {
@@ -85,10 +85,62 @@ func (service UserServiceImpl) Login(ctx context.Context, request web.UserLoginR
 
 	defer helper.CommitOrRollback(tx)
 
-	// user := service.repository.FindById(ctx, tx, request.Username)
+	user, err := service.repository.FindByUsername(ctx, tx, request.Username)
+	if err != nil {
+		panic(err)
+	}
 
-	// isValidPassword := CheckPasswordHash(request.Password, )
+	isValidPassword := CheckPasswordHash(request.Password, user.PasswordHash)
+	if isValidPassword != nil {
+		panic(isValidPassword)
+	}
+
+	accessToken, refreshToken, err := helper.GenerateTokens(user.Username)
+	if err != nil {
+		panic(err)
+	}
+
+	return helper.ToUserLoginResponse(user, accessToken, refreshToken)
 }
-func (service UserServiceImpl) FindById(ctx context.Context, request web.UserFindByIdRequest) web.UserResponse {
 
+func (service UserServiceImpl) FindById(ctx context.Context, request web.UserFindByIdRequest) web.UserResponse {
+	err := service.Validate.Struct(request)
+	if err != nil {
+		panic(err)
+	}
+
+	tx, err := service.DB.Begin()
+	if err != nil {
+		panic(err)
+	}
+
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.repository.FindById(ctx, tx, request.Id)
+	if err != nil {
+		panic(err)
+	}
+
+	return helper.ToUserResponse(user)
+}
+
+func (service UserServiceImpl) FindByUsername(ctx context.Context, request web.UserFindByUsernameRequest) web.UserResponse {
+	err := service.Validate.Struct(request)
+	if err != nil {
+		panic(err)
+	}
+
+	tx, err := service.DB.Begin()
+	if err != nil {
+		panic(err)
+	}
+
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.repository.FindByUsername(ctx, tx, request.Username)
+	if err != nil {
+		panic(err)
+	}
+
+	return helper.ToUserResponse(user)
 }

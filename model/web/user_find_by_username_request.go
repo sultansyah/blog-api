@@ -1,5 +1,5 @@
 package web
 
 type UserFindByUsernameRequest struct {
-	Username int `validate:"required" json:"username"`
+	Username string `validate:"required" json:"username"`
 }
