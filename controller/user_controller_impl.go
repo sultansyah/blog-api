@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/sultansyah/blog-api/model/web"
 	"github.com/sultansyah/blog-api/service"
 )
 
@@ -16,6 +17,7 @@ func NewUserController(service service.UserService) UserController {
 }
 
 func (controller *UserControllerImpl) Register(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
+	userRegisterRequest := web.UserRegisterRequest{}
 
 }
 

@@ -43,7 +43,7 @@ func CheckPasswordHash(password, hash string) error {
 	return nil
 }
 
-func (service UserServiceImpl) Create(ctx context.Context, request web.UserCreateRequest) web.UserResponse {
+func (service UserServiceImpl) Create(ctx context.Context, request web.UserRegisterRequest) web.UserResponse {
 	err := service.Validate.Struct(request)
 	if err != nil {
 		panic(err)
